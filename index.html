@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bravia Construction</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════
+   TOKENS
+═══════════════════════════════════ */
+:root {
+  --black:    #0a0a0a;
+  --white:    #ffffff;
+  --cream:    #f7f5f2;
+  --mid:      #4b5563;
+  --light:    #e6e2db;
+  --accent:   #c9a96e;
+  --accent-dk:#a07840;
+  --red:      #e8003d;
+  --ease:     cubic-bezier(.23,1,.32,1);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--black);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+  cursor: default;
+}
+
+h1, h2, h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+  line-height: 0.96;
+}
+
+p {
+  font-weight: 300;
+  color: var(--mid);
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+a, button { text-decoration: none; cursor: pointer; }
+
+/* ═══════════════════════════════════
+   PROGRESS BAR
+═══════════════════════════════════ */
+#prog {
+  position:fixed; top:0; left:0; height:2px; width:0%;
+  background:linear-gradient(90deg, var(--accent-dk), var(--accent));
+  z-index:2000; box-shadow:0 0 8px rgba(201,169,110,.7);
+  transition:width .06s linear;
+}
+
+/* ═══════════════════════════════════
+   NAVBAR
+═══════════════════════════════════ */
+#nav {
+  position:fixed; top:16px; left:50%; transform:translateX(-50%);
+  width:calc(100% - 48px); max-width:1160px; z-index:1000;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:13px 28px; border-radius:20px;
+  background:rgba(255,255,255,.1);
+  backdrop-filter:blur(22px) saturate(200%);
+  -webkit-backdrop-filter:blur(22px) saturate(200%);
+  border:1px solid rgba(255,255,255,.26);
+  box-shadow:0 6px 32px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.5);
+  transition:background .4s, box-shadow .4s;
+}
+#nav.scrolled {
+  background:rgba(255,255,255,.92);
+  box-shadow:0 6px 32px rgba(0,0,0,.14), inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.nav-logo {
+  font-family:'Cormorant Garamond', serif;
+  font-size:1.5rem; font-weight:700;
+  letter-spacing:.22em; text-transform:uppercase;
+  color:var(--white); line-height:1;
+  transition:color .3s; cursor:pointer;
+}
+#nav.scrolled .nav-logo { color:var(--black); }
+.nav-logo .dot { color:var(--accent); letter-spacing:0; }
+
+.nav-links { display:flex; align-items:center; gap:30px; list-style:none; }
+.nav-links a {
+  font-size:.74rem; font-weight:500; letter-spacing:.14em;
+  text-transform:uppercase; color:rgba(255,255,255,.85);
+  position:relative; transition:color .3s; cursor:pointer;
+}
+#nav.scrolled .nav-links a { color:var(--mid); }
+.nav-links a::after {
+  content:''; position:absolute; bottom:-3px; left:0;
+  width:0; height:1.5px; background:var(--accent);
+  transition:width .35s var(--ease);
+}
+.nav-links a:hover { color:var(--accent); }
+.nav-links a:hover::after { width:100%; }
+
+.btn-nav {
+  background:var(--accent) !important; color:var(--black) !important;
+  padding:8px 20px; border-radius:50px; font-weight:600 !important;
+  transition:background .3s, transform .2s !important;
+  border:none; cursor:pointer;
+}
+.btn-nav:hover { background:var(--white) !important; transform:scale(1.04); }
+.btn-nav::after { display:none !important; }
+
+/* ═══════════════════════════════════
+   SECTION DOTS
+═══════════════════════════════════ */
+#dots {
+  position:fixed; right:22px; top:50%; transform:translateY(-50%);
+  z-index:500; display:flex; flex-direction:column; gap:12px;
+}
+.dot {
+  width:6px; height:6px; border-radius:50%;
+  border:1.5px solid rgba(201,169,110,.55);
+  cursor:pointer; transition:all .3s;
+}
+.dot.on { background:var(--accent); border-color:var(--accent); transform:scale(1.5); }
+
+/* ═══════════════════════════════════
+   PARALLAX CORE
+═══════════════════════════════════ */
+.px { position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+.px-bg  { position:absolute; inset:-20%; background-size:cover; background-position:center; will-change:transform; }
+.px-ov  { position:absolute; inset:0; pointer-events:none; }
+.px-cnt { position:relative; z-index:3; width:100%; max-width:1160px; margin:0 auto; padding:0 40px; text-align:center; }
+
+.deco {
+  position:absolute; pointer-events:none; z-index:2;
+  font-family:'Cormorant Garamond', serif; font-weight:700;
+  font-size:clamp(6rem,20vw,20rem); color:rgba(255,255,255,.04);
+  letter-spacing:-.05em; white-space:nowrap; line-height:1; user-select:none;
+  will-change:transform;
+}
+.deco.tr { top:-5%; right:-2%; }
+.deco.bl { bottom:-5%; left:-1%; }
+
+/* ═══════════════════════════════════
+   KEYFRAMES
+═══════════════════════════════════ */
+@keyframes slideIn {
+  from { opacity:0; transform:translateY(28px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes scalePop {
+  from { opacity:0; transform:scale(0.85); }
+  to   { opacity:1; transform:scale(1); }
+}
+@keyframes wordReveal {
+  from { opacity:0; transform:translateY(16px) rotateX(12deg); filter:blur(4px); }
+  to   { opacity:1; transform:translateY(0) rotateX(0deg);    filter:blur(0); }
+}
+@keyframes lineGrow {
+  0%   { opacity:0; transform:scaleY(0); transform-origin:top; }
+  55%  { opacity:1; transform:scaleY(1); }
+  100% { opacity:0; transform:scaleY(1); transform-origin:bottom; }
+}
+@keyframes floatBadge {
+  0%, 100% { transform:translateY(-50%) translateY(0px); }
+  50%       { transform:translateY(-50%) translateY(-8px); }
+}
+@keyframes countTick {
+  from { transform:translateY(8px); opacity:0; }
+  to   { transform:translateY(0); opacity:1; }
+}
+@keyframes cardEnter {
+  from { opacity:0; transform:translateY(50px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes fadeInUp {
+  from { opacity:0; transform:translateY(40px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes slideInDown {
+  from { opacity:0; transform:translateY(-40px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes overlayIn {
+  from { opacity:0; transform:translateY(30px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ═══════════════════════════════════
+   PAGE OVERLAY SYSTEM
+═══════════════════════════════════ */
+.page-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: var(--cream);
+  z-index: 800;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+  overflow-y: auto;
+}
+.page-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ── Sticky overlay header ── */
+.page-header {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 40px;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  z-index: 100;
+  animation: slideInDown 0.45s var(--ease) both;
+  border-bottom: 1px solid rgba(201,169,110,.2);
+}
+
+/* Back to Home button — leftmost */
+.btn-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  background: rgba(201,169,110,.12);
+  border: 1px solid rgba(201,169,110,.4);
+  border-radius: 8px;
+  color: var(--accent);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .25s, border-color .25s, color .25s, transform .2s;
+  flex-shrink: 0;
+}
+.btn-home:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--black);
+  transform: translateX(-2px);
+}
+.btn-home svg {
+  width: 14px; height: 14px;
+  flex-shrink: 0;
+}
+
+/* Divider between back btn and title */
+.header-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255,255,255,.15);
+  flex-shrink: 0;
+}
+
+.page-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  flex: 1;
+}
+
+/* Close (×) button — rightmost */
+.close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; height: 40px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 8px;
+  cursor: pointer;
+  color: rgba(255,255,255,.7);
+  font-size: 1.3rem;
+  line-height: 1;
+  transition: background .25s, border-color .25s, color .25s, transform .25s;
+  flex-shrink: 0;
+}
+.close-btn:hover {
+  background: #e8003d22;
+  border-color: #e8003d88;
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+.page-content {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 70px 40px 100px;
+  animation: fadeInUp 0.55s var(--ease) 0.15s both;
+}
+
+/* ═══════════════════════════════════
+   CONTACT PAGE
+═══════════════════════════════════ */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  margin-top: 40px;
+}
+.contact-info-group { display:flex; flex-direction:column; gap:24px; }
+
+.contact-card {
+  background: rgba(255,255,255,.7);
+  border: 1px solid var(--light);
+  border-radius: 12px;
+  padding: 28px 32px;
+  transition: all 0.4s var(--ease);
+  position: relative;
+  overflow: hidden;
+}
+.contact-card::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, var(--accent-dk), var(--accent));
+  transform:scaleX(0); transition:transform .4s var(--ease); transform-origin:left;
+}
+.contact-card:hover { border-color:var(--accent); box-shadow:0 10px 36px rgba(201,169,110,.13); transform:translateY(-5px); }
+.contact-card:hover::before { transform:scaleX(1); }
+
+.contact-card-title {
+  font-family:'Cormorant Garamond', serif;
+  font-size:1.35rem; font-weight:700;
+  color:var(--black); margin-bottom:12px;
+}
+.contact-card-content { color:var(--mid); font-size:.95rem; line-height:1.8; }
+.contact-card-content strong { color:var(--black); font-weight:500; }
+.contact-card-content a { color:var(--accent-dk); transition:color .3s; }
+.contact-card-content a:hover { color:var(--accent); }
+
+.location-showcase {
+  position:relative; border-radius:12px; overflow:hidden;
+  height:100%; min-height:460px;
+  border:2px solid var(--accent);
+  box-shadow:0 20px 60px rgba(0,0,0,.1);
+}
+.location-showcase iframe { width:100%; height:100%; border:none; display:block; }
+.location-badge {
+  position:absolute; top:18px; right:18px;
+  background:rgba(0,0,0,.88); color:var(--white);
+  padding:10px 18px; border-radius:50px;
+  font-size:.76rem; font-weight:600; letter-spacing:.1em;
+  z-index:10; border:1px solid var(--accent);
+}
+
+/* ═══════════════════════════════════
+   ABOUT PAGE
+═══════════════════════════════════ */
+.about-hero {
+  background:linear-gradient(135deg, var(--black), #1a1a1a);
+  color:var(--white);
+  padding:56px 60px; border-radius:12px; margin-bottom:56px; text-align:center;
+}
+.about-hero h2 { font-size:2.6rem; margin-bottom:16px; color:var(--white); line-height:1.1; }
+.about-hero em { color:var(--accent); font-style:italic; }
+.about-hero p { color:rgba(255,255,255,.72); max-width:660px; margin:0 auto; }
+
+.about-sections { display:grid; grid-template-columns:1fr 1fr; gap:40px; margin-bottom:56px; }
+.about-section {
+  padding:36px; background:rgba(201,169,110,.06);
+  border-radius:12px; border-left:4px solid var(--accent);
+}
+.about-section h3 { font-size:1.65rem; color:var(--black); margin-bottom:14px; }
+.about-section p { color:var(--mid); line-height:1.9; }
+
+.timeline { position:relative; padding:40px 0; }
+.timeline-item {
+  display:grid; grid-template-columns:160px 1fr;
+  gap:40px; margin-bottom:40px; position:relative;
+}
+.timeline-item::before {
+  content:''; position:absolute; left:74px; top:10px;
+  width:16px; height:16px;
+  background:var(--accent); border-radius:50%;
+  border:3px solid var(--cream);
+  box-shadow:0 0 0 3px var(--accent);
+}
+.timeline-year {
+  font-family:'Cormorant Garamond', serif;
+  font-size:1.9rem; font-weight:700; color:var(--accent); padding-top:2px;
+}
+.timeline-content h4 {
+  font-family:'Cormorant Garamond', serif;
+  font-size:1.2rem; color:var(--black); margin-bottom:8px;
+}
+.timeline-content p { color:var(--mid); font-size:.93rem; }
+
+/* ═══════════════════════════════════
+   TESTIMONIALS PAGE
+═══════════════════════════════════ */
+.testimonials-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:32px; margin-top:40px; }
+
+.testimonial-card {
+  background:rgba(255,255,255,.65);
+  border:1px solid var(--light);
+  padding:36px; border-radius:12px;
+  transition:all 0.4s var(--ease);
+  position:relative; overflow:hidden;
+}
+.testimonial-card:hover {
+  transform:translateY(-10px);
+  box-shadow:0 20px 60px rgba(0,0,0,.09);
+  border-color:var(--accent);
+}
+.testimonial-text {
+  font-size:.97rem; line-height:1.85; color:#374151;
+  margin-bottom:22px; font-style:italic;
+  border-left:3px solid var(--accent);
+  padding-left:16px;
+}
+.testimonial-author { display:flex; align-items:center; gap:14px; }
+.testimonial-avatar {
+  width:52px; height:52px; border-radius:50%;
+  background:linear-gradient(135deg, var(--accent-dk), var(--accent));
+  display:flex; align-items:center; justify-content:center;
+  color:var(--white); font-weight:700; font-size:1.3rem;
+  flex-shrink:0;
+}
+.testimonial-info h4 { font-family:'Cormorant Garamond', serif; font-size:1.05rem; color:var(--black); margin-bottom:3px; }
+.testimonial-info span { font-size:.8rem; color:var(--accent-dk); letter-spacing:.04em; }
+.star-rating { color:var(--accent); font-size:.88rem; margin-bottom:12px; letter-spacing:2px; }
+
+/* ═══════════════════════════════════
+   ENQUIRY FORM PAGE
+═══════════════════════════════════ */
+.enquiry-container { max-width:680px; margin:0 auto; }
+.enquiry-intro { margin-bottom:44px; }
+.enquiry-intro h2 { font-size:2.2rem; color:var(--black); margin-bottom:10px; }
+.enquiry-intro p { color:var(--mid); }
+
+.form-group { margin-bottom:26px; }
+.form-group label {
+  display:block;
+  font-family:'Cormorant Garamond', serif;
+  font-size:1.05rem; font-weight:600;
+  color:var(--black); margin-bottom:10px; letter-spacing:-.01em;
+}
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width:100%; padding:14px 18px;
+  border:2px solid var(--light); border-radius:8px;
+  font-family:'DM Sans', sans-serif;
+  font-size:.97rem; color:var(--black);
+  background:var(--white);
+  transition:all .3s ease;
+  appearance:none; -webkit-appearance:none;
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline:none;
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(201,169,110,.12);
+}
+.form-group textarea { resize:vertical; min-height:120px; }
+
+.form-actions { display:flex; gap:14px; margin-top:36px; }
+.btn-submit {
+  flex:2; padding:15px 32px;
+  background:linear-gradient(135deg, var(--accent-dk), var(--accent));
+  color:var(--white); border:none; border-radius:8px;
+  font-family:'DM Sans', sans-serif;
+  font-size:.97rem; font-weight:600; letter-spacing:.05em;
+  cursor:pointer; transition:all .3s;
+}
+.btn-submit:hover { transform:translateY(-3px); box-shadow:0 10px 32px rgba(201,169,110,.3); }
+.btn-cancel {
+  flex:1; padding:15px 24px;
+  background:transparent; color:var(--mid);
+  border:2px solid var(--light); border-radius:8px;
+  font-family:'DM Sans', sans-serif;
+  font-size:.97rem; font-weight:500;
+  cursor:pointer; transition:all .3s;
+}
+.btn-cancel:hover { border-color:var(--accent); color:var(--accent-dk); }
+
+/* ═══════════════════════════════════
+   HERO
+═══════════════════════════════════ */
+#px-hero { min-height:100vh; }
+#px-hero .px-bg {
+  background-image:url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1800&q=80');
+}
+#px-hero .px-ov {
+  background:linear-gradient(170deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.18) 50%, rgba(0,0,0,.72) 100%);
+}
+
+.hero-tag {
+  display:inline-block;
+  font-size:.7rem; letter-spacing:.3em; text-transform:uppercase;
+  color:var(--accent); border:1px solid rgba(201,169,110,.42);
+  padding:7px 20px; border-radius:50px; margin-bottom:26px;
+  animation:slideIn .9s .2s var(--ease) both;
+}
+
+.hero-h {
+  font-family:'Cormorant Garamond', serif;
+  font-size:clamp(4.5rem,10vw,9.5rem);
+  font-weight:700; color:var(--white);
+  line-height:.93; letter-spacing:-.03em;
+  margin-bottom:24px;
+  perspective:600px;
+  text-shadow: 0 2px 24px rgba(0,0,0,.35);
+}
+.hero-h .w {
+  display:inline-block; margin-right:.18em;
+  opacity:0;
+  will-change:transform, opacity, filter;
+  backface-visibility:hidden;
+}
+.hero-h em { font-style:italic; color:var(--accent); }
+
+.hero-sub {
+  color:rgba(255,255,255,.82);
+  max-width:460px; margin:0 auto 40px;
+  animation:slideIn .9s .7s var(--ease) both;
+  text-shadow:0 1px 10px rgba(0,0,0,.4);
+}
+
+.hero-btns {
+  display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
+  animation:scalePop .8s .85s var(--ease) both;
+}
+
+.btn-primary {
+  display:inline-block; background:var(--accent); color:var(--black);
+  padding:13px 34px; border-radius:50px;
+  font-size:.76rem; font-weight:600; letter-spacing:.13em; text-transform:uppercase;
+  box-shadow:0 6px 24px rgba(201,169,110,.45);
+  transition:background .3s, transform .2s, box-shadow .3s;
+  position:relative; overflow:hidden;
+  border:none; cursor:pointer;
+}
+.btn-primary::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(105deg, transparent 40%, rgba(255,255,255,.28) 50%, transparent 60%);
+  transform:translateX(-100%); transition:transform .5s var(--ease);
+}
+.btn-primary:hover::after { transform:translateX(100%); }
+.btn-primary:hover { background:var(--white); transform:translateY(-2px); }
+
+.btn-ghost {
+  display:inline-block; background:rgba(255,255,255,.12);
+  backdrop-filter:blur(10px); color:var(--white);
+  padding:13px 34px; border-radius:50px;
+  font-size:.76rem; font-weight:400; letter-spacing:.13em; text-transform:uppercase;
+  border:1px solid rgba(255,255,255,.35);
+  transition:background .3s, transform .2s;
+  cursor:pointer;
+}
+.btn-ghost:hover { background:rgba(255,255,255,.22); transform:translateY(-2px); }
+
+.scroll-cue {
+  position:absolute; bottom:36px; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:8px; z-index:3;
+  animation:slideIn .9s .9s var(--ease) both;
+}
+.scroll-cue span {
+  font-size:.66rem; letter-spacing:.24em; text-transform:uppercase;
+  color:rgba(255,255,255,.5);
+}
+.scroll-ln {
+  width:1px; height:52px;
+  background:linear-gradient(to bottom, rgba(255,255,255,.6), transparent);
+  animation:lineGrow 2s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════
+   COUNTER STRIP
+═══════════════════════════════════ */
+.counter-strip {
+  background:var(--black); padding:50px 40px;
+  display:flex; justify-content:center; align-items:center;
+  flex-wrap:wrap; gap:0; position:relative; z-index:4;
+}
+.cstat { flex:1; min-width:150px; text-align:center; padding:0 20px; position:relative; }
+.cstat + .cstat::before {
+  content:''; position:absolute; left:0; top:8%; bottom:8%;
+  width:1px; background:rgba(255,255,255,.1);
+}
+.cnum {
+  font-family:'DM Sans', sans-serif;
+  font-size:3.4rem; font-weight:700; color:var(--accent); line-height:1; display:block;
+}
+.cnum.ticked { animation:countTick .25s var(--ease); }
+.clabel {
+  font-size:.68rem; letter-spacing:.18em; text-transform:uppercase;
+  color:rgba(255,255,255,.45); margin-top:8px; display:block;
+}
+
+/* ═══════════════════════════════════
+   CONTENT SECTIONS
+═══════════════════════════════════ */
+.sect { background:var(--cream); padding:100px 40px; position:relative; z-index:4; }
+.wrap { max-width:1160px; margin:0 auto; }
+
+.lbl {
+  display:block; font-size:.68rem; font-weight:600;
+  letter-spacing:.28em; text-transform:uppercase;
+  color:var(--accent-dk); margin-bottom:14px;
+}
+.lbl.lt { color:var(--accent); }
+
+.stitle {
+  font-family:'Cormorant Garamond', serif;
+  font-size:clamp(2.2rem,4.5vw,3.8rem); font-weight:700;
+  color:var(--black); line-height:1.05; letter-spacing:-.02em;
+  margin-bottom:0;
+}
+.stitle em { font-style:italic; color:var(--accent-dk); }
+.stitle.lt { color:var(--white); }
+.stitle.lt em { color:var(--accent); }
+
+/* ═══════════════════════════════════
+   ABOUT SECTION (HOME)
+═══════════════════════════════════ */
+.about-grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:72px; align-items:center;
+}
+
+.about-stats {
+  display:flex; align-items:stretch;
+  border-top:1px solid var(--light); border-bottom:1px solid var(--light);
+  padding:22px 0; margin-top:38px;
+}
+.astat { flex:1; text-align:center; padding:0 16px; position:relative; }
+.astat + .astat::before {
+  content:''; position:absolute; left:0; top:0; bottom:0;
+  width:1px; background:var(--light);
+}
+.astat-n {
+  font-family:'DM Sans', sans-serif;
+  font-size:2.4rem; font-weight:700; color:var(--accent-dk); line-height:1; display:block;
+}
+.astat-l {
+  font-size:.66rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--mid); margin-top:5px; display:block;
+}
+
+.about-imgs { position:relative; height:500px; }
+.aimg-main {
+  position:absolute; top:0; left:0; width:74%; height:72%;
+  object-fit:cover; border-radius:4px; display:block;
+  box-shadow:18px 18px 52px rgba(0,0,0,.16);
+  transition:transform .6s var(--ease), box-shadow .6s;
+}
+.aimg-main:hover { transform:scale(1.02); box-shadow:24px 24px 60px rgba(0,0,0,.22); }
+.aimg-sec {
+  position:absolute; bottom:0; right:0; width:54%; height:50%;
+  object-fit:cover; border-radius:4px; display:block;
+  border:6px solid var(--cream); box-shadow:0 10px 36px rgba(0,0,0,.12);
+  transition:transform .6s var(--ease);
+}
+.aimg-sec:hover { transform:scale(1.03); }
+.about-badge {
+  position:absolute; top:44%; right:8%; transform:translateY(-50%);
+  z-index:2; background:var(--black); color:var(--white);
+  padding:14px 18px; border-radius:10px; text-align:center;
+  font-family:'Cormorant Garamond', serif; font-size:2rem; font-weight:700; line-height:1.1;
+  box-shadow:0 10px 32px rgba(0,0,0,.28);
+  animation:floatBadge 4s ease-in-out infinite;
+}
+.about-badge small {
+  display:block; font-family:'DM Sans', sans-serif;
+  font-size:.52rem; letter-spacing:.14em; text-transform:uppercase;
+  font-weight:400; color:var(--accent); margin-top:4px;
+}
+
+/* ═══════════════════════════════════
+   VISION PARALLAX
+═══════════════════════════════════ */
+#px-vis { min-height:75vh; }
+#px-vis .px-bg {
+  background-image:url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=1800&q=80');
+}
+#px-vis .px-ov {
+  background:linear-gradient(105deg, rgba(0,0,0,.82) 0%, rgba(0,0,0,.45) 55%, rgba(0,0,0,.12) 100%);
+}
+#px-vis .px-cnt { text-align:left; }
+
+.glass-tag {
+  display:inline-flex; align-items:center; gap:10px;
+  background:rgba(255,255,255,.1); backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.22); border-radius:50px;
+  padding:9px 22px; color:rgba(255,255,255,.9); font-size:.78rem; letter-spacing:.1em; margin-bottom:24px;
+}
+.glass-tag strong { color:var(--accent); font-weight:700; }
+
+.vis-h {
+  font-family:'Cormorant Garamond', serif;
+  font-size:clamp(2.6rem,6vw,5rem); font-weight:700;
+  color:var(--white); line-height:1.04; letter-spacing:-.03em;
+  max-width:640px; margin-bottom:18px; margin-left:0; margin-right:auto;
+  text-shadow:0 2px 20px rgba(0,0,0,.3);
+}
+.vis-h em { font-style:italic; color:var(--accent); }
+.vis-p {
+  font-size:.94rem; color:rgba(255,255,255,.7);
+  max-width:420px; font-weight:300;
+}
+
+/* ═══════════════════════════════════
+   SERVICES
+═══════════════════════════════════ */
+.svc-hd {
+  display:flex; justify-content:space-between; align-items:flex-end;
+  flex-wrap:wrap; gap:24px; margin-bottom:48px;
+}
+.svc-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:2px; background:var(--light);
+}
+.svc-card {
+  background:var(--cream); padding:40px 32px;
+  position:relative; overflow:hidden;
+  transition:background .4s;
+  opacity:0; transform:translateY(50px);
+}
+.svc-card.entered {
+  animation:cardEnter .7s var(--ease) forwards;
+  animation-delay:calc(var(--i, 0) * 0.1s);
+}
+.svc-card::after {
+  content:''; position:absolute; bottom:0; left:0;
+  width:0; height:2px; background:var(--accent);
+  transition:width .45s var(--ease);
+}
+.svc-card:hover::after { width:100%; }
+.svc-card:hover       { background:var(--black); }
+.svc-card:hover .svc-n { color:var(--accent); }
+.svc-card:hover .svc-h { color:var(--white); }
+.svc-card:hover .svc-p { color:rgba(255,255,255,.55); }
+.svc-n {
+  display:block; font-family:'Cormorant Garamond', serif;
+  font-size:.88rem; color:var(--accent-dk); font-weight:600;
+  letter-spacing:.06em; margin-bottom:16px; transition:color .4s;
+}
+.svc-h {
+  font-family:'Cormorant Garamond', serif; font-size:1.4rem;
+  font-weight:700; color:var(--black); margin-bottom:10px;
+  transition:color .4s; letter-spacing:-.01em; line-height:1.2;
+}
+.svc-p { font-size:.82rem; line-height:1.72; color:var(--mid); font-weight:300; transition:color .4s; }
+
+/* ═══════════════════════════════════
+   QUOTE PARALLAX
+═══════════════════════════════════ */
+#px-qt { min-height:65vh; }
+#px-qt .px-bg {
+  background-image:url('https://images.unsplash.com/photo-1503594384566-461fe158e797?w=1800&q=80');
+}
+#px-qt .px-ov { background:rgba(0,0,0,.65); }
+
+.q-wrap { max-width:760px; margin:0 auto; text-align:center; }
+.q-mark {
+  font-family:'Cormorant Garamond', serif; font-size:7rem; line-height:.5;
+  color:var(--accent); opacity:.5; display:block; margin-bottom:16px;
+}
+.q-text {
+  font-family:'Cormorant Garamond', serif;
+  font-size:clamp(1.5rem,3.5vw,2.7rem); font-style:italic;
+  font-weight:600; color:var(--white); line-height:1.45; margin-bottom:26px;
+  text-shadow:0 2px 16px rgba(0,0,0,.4);
+}
+.q-wrap .w {
+  display:inline-block; margin-right:.2em;
+  opacity:0; will-change:transform, opacity;
+}
+.q-author { font-size:.72rem; letter-spacing:.24em; text-transform:uppercase; color:var(--accent); }
+
+/* ═══════════════════════════════════
+   PROJECTS BENTO
+═══════════════════════════════════ */
+.proj-hd {
+  display:flex; justify-content:space-between;
+  align-items:flex-end; flex-wrap:wrap; gap:20px; margin-bottom:44px;
+}
+.bento {
+  display:grid;
+  grid-template-columns:1.45fr 1fr 1fr;
+  grid-template-rows:260px 240px; gap:10px;
+}
+.bc      { position:relative; overflow:hidden; border-radius:6px; cursor:pointer; }
+.bc.big  { grid-column:1; grid-row:1/3; }
+.bc.c2r1 { grid-column:2; grid-row:1; }
+.bc.c2r2 { grid-column:2; grid-row:2; }
+.bc.c3r1 { grid-column:3; grid-row:1; }
+.bc.c3r2 { grid-column:3; grid-row:2; }
+
+.bc { opacity:0; transform:translateY(50px); }
+.bc.entered {
+  animation:cardEnter .75s var(--ease) forwards;
+  animation-delay:calc(var(--i,0) * 0.15s);
+}
+.bc img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .7s var(--ease); }
+.bc:hover img { transform:scale(1.06); }
+.bc-mask {
+  position:absolute; inset:0;
+  background:linear-gradient(to top, rgba(0,0,0,.78) 0%, transparent 52%);
+  opacity:0; display:flex; align-items:flex-end; padding:22px;
+  transition:opacity .38s;
+}
+.bc:hover .bc-mask { opacity:1; }
+.bc-info { transform:translateY(10px); transition:transform .38s; }
+.bc:hover .bc-info { transform:translateY(0); }
+.bc-info h3 {
+  font-family:'Cormorant Garamond', serif; font-size:1.25rem;
+  font-weight:700; color:var(--white); margin-bottom:3px; letter-spacing:-.01em;
+}
+.bc-info span { font-size:.7rem; color:var(--accent); letter-spacing:.1em; text-transform:uppercase; }
+
+/* ═══════════════════════════════════
+   CTA PARALLAX
+═══════════════════════════════════ */
+#px-cta { min-height:80vh; }
+#px-cta .px-bg {
+  background-image:url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1800&q=80');
+}
+#px-cta .px-ov {
+  background:linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.32) 50%, rgba(0,0,0,.55) 100%);
+}
+.cta-in { max-width:640px; margin:0 auto; text-align:center; }
+.cta-in .lbl { color:var(--accent); }
+.cta-h {
+  font-family:'Cormorant Garamond', serif;
+  font-size:clamp(3rem,7vw,6.2rem); font-weight:700;
+  color:var(--white); line-height:.96; letter-spacing:-.03em;
+  margin:14px 0 20px;
+  text-shadow:0 2px 30px rgba(0,0,0,.4);
+}
+.cta-h em { font-style:italic; color:var(--accent); }
+.cta-p { color:rgba(255,255,255,.65); max-width:400px; margin:0 auto 34px; font-size:.94rem; }
+.cta-btns { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+
+/* ═══════════════════════════════════
+   FOOTER
+═══════════════════════════════════ */
+.foot { background:#050505; text-align:center; padding:26px 24px; z-index:4; position:relative; }
+.foot p { font-size:.76rem; color:rgba(255,255,255,.28); letter-spacing:.08em; margin:0; }
+.foot strong { color:var(--accent); font-weight:400; }
+
+/* ═══════════════════════════════════
+   SCROLL REVEAL
+═══════════════════════════════════ */
+.rv {
+  opacity:0; transform:translateY(32px);
+  transition:opacity .85s var(--ease), transform .85s var(--ease);
+}
+.rv.d1 { transition-delay:.1s; } .rv.d2 { transition-delay:.22s; }
+.rv.d3 { transition-delay:.34s; } .rv.d4 { transition-delay:.46s; }
+.rv.in { opacity:1; transform:translateY(0); }
+
+.rv-scale {
+  opacity:0; transform:scale(0.9);
+  transition:opacity .7s var(--ease), transform .7s var(--ease);
+}
+.rv-scale.in { opacity:1; transform:scale(1); }
+
+/* ═══════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════ */
+@media(max-width:960px){
+  #nav { width:calc(100% - 28px); padding:11px 20px; }
+  .nav-links, .btn-nav { display:none; }
+  .sect { padding:80px 24px; }
+  .counter-strip { padding:40px 20px; }
+  .about-grid { grid-template-columns:1fr; gap:48px; }
+  .about-imgs  { height:340px; }
+  .svc-grid    { grid-template-columns:1fr 1fr; }
+  .bento { grid-template-columns:1fr 1fr; grid-template-rows:220px 200px 200px; }
+  .bc.big  { grid-column:1/3; grid-row:1; }
+  .bc.c2r1 { grid-column:1; grid-row:2; }
+  .bc.c2r2 { grid-column:2; grid-row:2; }
+  .bc.c3r1 { grid-column:1; grid-row:3; }
+  .bc.c3r2 { grid-column:2; grid-row:3; }
+  #dots { display:none; }
+  .px-cnt { padding:0 24px; }
+  #px-vis .px-cnt { text-align:center; }
+  .vis-h { max-width:100%; }
+  .contact-grid { grid-template-columns:1fr; gap:40px; }
+  .about-sections { grid-template-columns:1fr; }
+  .testimonials-grid { grid-template-columns:1fr; }
+  .page-content { padding:60px 24px 80px; }
+  .page-header { padding:16px 24px; }
+  .page-title { font-size:1.45rem; }
+}
+@media(max-width:600px){
+  .svc-grid { grid-template-columns:1fr; }
+  .about-stats { flex-wrap:wrap; }
+  .bento { grid-template-columns:1fr; grid-template-rows:repeat(5,200px); }
+  .bc.big  { grid-column:1; grid-row:1; }
+  .bc.c2r1 { grid-column:1; grid-row:2; }
+  .bc.c2r2 { grid-column:1; grid-row:3; }
+  .bc.c3r1 { grid-column:1; grid-row:4; }
+  .bc.c3r2 { grid-column:1; grid-row:5; }
+  .form-actions { flex-direction:column; }
+  .btn-home span { display:none; }
+  .about-hero { padding:40px 28px; }
+}
+</style>
+</head>
+<body>
+
+<div id="prog"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a onclick="goHome()" class="nav-logo">BRAVIA<span class="dot">.</span></a>
+  <ul class="nav-links">
+    <li><a onclick="goToSection('sec-about')">About</a></li>
+    <li><a onclick="goToSection('sec-svc')">Services</a></li>
+    <li><a onclick="goToSection('sec-proj')">Projects</a></li>
+    <li><a onclick="goToSection('px-cta')" class="btn-nav">Get a Quote</a></li>
+  </ul>
+</nav>
+
+<!-- DOTS -->
+<nav id="dots" aria-hidden="true">
+  <div class="dot on"></div><div class="dot"></div><div class="dot"></div>
+  <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  <div class="dot"></div><div class="dot"></div>
+</nav>
+
+<!-- ════════ HERO ════════ -->
+<section class="px" id="px-hero">
+  <div class="px-bg" id="bg1"></div>
+  <div class="px-ov"></div>
+  <div class="deco tr" id="dw1a">BUILD</div>
+  <div class="deco bl" id="dw1b">CRAFT</div>
+  <div class="px-cnt">
+    <div class="hero-tag">Est. 2008 &nbsp;·&nbsp; Premium Construction</div>
+    <h1 class="hero-h" id="hero-title">
+      <span class="w">We</span>
+      <span class="w">Build</span>
+      <span class="w"><em>Your</em></span>
+      <span class="w">Vision</span>
+    </h1>
+    <p class="hero-sub">
+      Landmark residential, commercial &amp; mixed-use developments —
+      crafted to endure, designed to inspire.
+    </p>
+    <div class="hero-btns">
+      <a onclick="goToSection('sec-proj')" class="btn-primary">Explore Projects</a>
+      <a onclick="goToSection('px-cta')" class="btn-ghost">Get a Quote</a>
+    </div>
+  </div>
+  <div class="scroll-cue">
+    <span>Scroll to explore</span>
+    <div class="scroll-ln"></div>
+  </div>
+</section>
+
+<!-- ════════ COUNTER STRIP ════════ -->
+<div class="counter-strip" id="sec-stats">
+  <div class="cstat rv"><span class="cnum" data-target="320">0</span><span class="clabel">Projects Completed</span></div>
+  <div class="cstat rv d1"><span class="cnum" data-target="16">0</span><span class="clabel">Years of Excellence</span></div>
+  <div class="cstat rv d2"><span class="cnum" data-target="98">0</span><span class="clabel">Client Satisfaction %</span></div>
+  <div class="cstat rv d3"><span class="cnum" data-target="42">0</span><span class="clabel">Industry Awards</span></div>
+</div>
+
+<!-- ════════ ABOUT (HOME) ════════ -->
+<section class="sect" id="sec-about">
+  <div class="wrap">
+    <div class="about-grid">
+      <div>
+        <span class="lbl rv">Who We Are</span>
+        <h2 class="stitle rv d1">More Than<br><em>Construction</em></h2>
+        <p class="rv d2" style="margin-top:20px">
+          Since 2008, Bravia has shaped skylines and elevated communities across the region.
+          We bring together architects, engineers, and master craftsmen under one standard —
+          <em style="font-family:'Cormorant Garamond',serif;color:var(--accent-dk);font-style:italic">uncompromising excellence</em>.
+        </p>
+        <p class="rv d3" style="margin-top:14px">
+          Every project is treated as a legacy — built to stand long after the scaffolding comes down.
+          Precision, honesty, and craftsmanship are not ideals for us; they are the baseline.
+        </p>
+        <div style="margin-top:24px;" class="rv d3">
+          <a onclick="openPage('about')" class="btn-primary">Learn More About Us →</a>
+        </div>
+        <div class="about-stats rv d2">
+          <div class="astat"><span class="astat-n">320+</span><span class="astat-l">Projects</span></div>
+          <div class="astat"><span class="astat-n">16 yrs</span><span class="astat-l">Experience</span></div>
+          <div class="astat"><span class="astat-n">42+</span><span class="astat-l">Awards</span></div>
+        </div>
+      </div>
+      <div class="about-imgs rv-scale d2">
+        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80" alt="Luxury residence" class="aimg-main">
+        <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80" alt="Modern building"  class="aimg-sec">
+        <div class="about-badge">A+<small>Grade Build</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ VISION PX ════════ -->
+<section class="px" id="px-vis">
+  <div class="px-bg" id="bg2"></div>
+  <div class="px-ov"></div>
+  <div class="deco tr" id="dw2">VISION</div>
+  <div class="px-cnt">
+    <div class="glass-tag rv"><strong>16</strong>&nbsp;Years Shaping the Built Environment</div>
+    <h2 class="vis-h rv d1">Architecture That<br><em>Outlasts</em> Generations</h2>
+    <p class="vis-p rv d2">
+      Every structure we raise is a commitment to the people who will inhabit
+      it — today, and fifty years from now.
+    </p>
+  </div>
+</section>
+
+<!-- ════════ SERVICES ════════ -->
+<section class="sect" id="sec-svc">
+  <div class="wrap">
+    <div class="svc-hd">
+      <div>
+        <span class="lbl rv">What We Build</span>
+        <h2 class="stitle rv d1">Our Core<br><em>Services</em></h2>
+      </div>
+      <p class="rv d2" style="max-width:340px;margin:0;font-size:.96rem">
+        End-to-end solutions across every discipline of the built environment.
+      </p>
+    </div>
+    <div class="svc-grid" id="svc-grid">
+      <div class="svc-card" style="--i:0"><span class="svc-n">01</span><div class="svc-h">Residential</div><p class="svc-p">Custom homes and luxury villas that reflect each client's vision — built to last a lifetime.</p></div>
+      <div class="svc-card" style="--i:1"><span class="svc-n">02</span><div class="svc-h">Commercial</div><p class="svc-p">Office towers and mixed-use developments engineered for efficiency and long-term performance.</p></div>
+      <div class="svc-card" style="--i:2"><span class="svc-n">03</span><div class="svc-h">Interior Fit-Out</div><p class="svc-p">Precision finishing and custom millwork that transform shells into breathing, living spaces.</p></div>
+      <div class="svc-card" style="--i:3"><span class="svc-n">04</span><div class="svc-h">Project Management</div><p class="svc-p">Full oversight from procurement through commissioning — on time, on budget, without compromise.</p></div>
+      <div class="svc-card" style="--i:4"><span class="svc-n">05</span><div class="svc-h">Restoration</div><p class="svc-p">Sensitive heritage retrofits that honour original character while meeting modern performance codes.</p></div>
+      <div class="svc-card" style="--i:5"><span class="svc-n">06</span><div class="svc-h">Civil Infrastructure</div><p class="svc-p">Roads, drainage, and utilities — the invisible foundations that make everything above ground possible.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ QUOTE PX ════════ -->
+<section class="px" id="px-qt">
+  <div class="px-bg" id="bg3"></div>
+  <div class="px-ov"></div>
+  <div class="px-cnt">
+    <div class="q-wrap">
+      <span class="q-mark">&ldquo;</span>
+      <p class="q-text" id="q-text">
+        <span class="w">Precision</span>
+        <span class="w">is</span>
+        <span class="w">not</span>
+        <span class="w">a</span>
+        <span class="w">detail</span>
+        <span class="w">—</span>
+        <span class="w">it</span>
+        <span class="w">is</span>
+        <span class="w">the</span>
+        <span class="w">entire</span>
+        <span class="w">discipline.</span>
+      </p>
+      <div class="q-author rv">— The Bravia Philosophy</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ PROJECTS ════════ -->
+<section class="sect" id="sec-proj">
+  <div class="wrap">
+    <div class="proj-hd">
+      <div>
+        <span class="lbl rv">Selected Work</span>
+        <h2 class="stitle rv d1">Featured<br><em>Projects</em></h2>
+      </div>
+      <a href="#" class="btn-primary rv d2">View All →</a>
+    </div>
+    <div class="bento" id="bento">
+      <div class="bc big" style="--i:0"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=900&q=80" alt="Lumière"><div class="bc-mask"><div class="bc-info"><h3>Lumière Residences</h3><span>Luxury Villa · 2024</span></div></div></div>
+      <div class="bc c2r1" style="--i:1"><img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=700&q=80" alt="Vega Tower"><div class="bc-mask"><div class="bc-info"><h3>Vega Tower</h3><span>Commercial · 2023</span></div></div></div>
+      <div class="bc c2r2" style="--i:2"><img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=700&q=80" alt="Soleil Villa"><div class="bc-mask"><div class="bc-info"><h3>Soleil Villa</h3><span>Residential · 2023</span></div></div></div>
+      <div class="bc c3r1" style="--i:3"><img src="https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=700&q=80" alt="Nova Residences"><div class="bc-mask"><div class="bc-info"><h3>Nova Residences</h3><span>Luxury · 2022</span></div></div></div>
+      <div class="bc c3r2" style="--i:4"><img src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=700&q=80" alt="Meridian Office"><div class="bc-mask"><div class="bc-info"><h3>Meridian Office</h3><span>Commercial · 2022</span></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ CTA PX ════════ -->
+<section class="px" id="px-cta">
+  <div class="px-bg" id="bg4"></div>
+  <div class="px-ov"></div>
+  <div class="deco bl" id="dw4">BRAVIA</div>
+  <div class="px-cnt">
+    <div class="cta-in">
+      <span class="lbl lt rv">Ready to Build?</span>
+      <h2 class="cta-h rv d1">Start Your<br><em>Project</em><br>Today</h2>
+      <p class="cta-p rv d2">
+        From first sketch to final handover — our team is ready.
+        Let's build something that endures.
+      </p>
+      <div class="cta-btns rv d3">
+        <a onclick="openPage('enquiry')" class="btn-primary">Start a Project</a>
+        <a onclick="goToSection('sec-proj')" class="btn-ghost">View Our Work</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <p>© 2025 <strong>Bravia Construction</strong>. All Rights Reserved. &nbsp;·&nbsp; Built with precision.</p>
+</footer>
+
+<!-- ════════════════════════════════
+     PAGE OVERLAYS
+════════════════════════════════ -->
+
+<!-- CONTACT PAGE -->
+<div class="page-overlay" id="page-contact">
+  <div class="page-header">
+    <button class="btn-home" onclick="goHome()">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9.5L10 3l7 6.5"/><path d="M5 8v8a1 1 0 001 1h3v-4h2v4h3a1 1 0 001-1V8"/>
+      </svg>
+      <span>Back to Home</span>
+    </button>
+    <div class="header-divider"></div>
+    <h1 class="page-title">Contact Us</h1>
+    <button class="close-btn" onclick="closePage()" title="Close">&times;</button>
+  </div>
+  <div class="page-content">
+    <div class="contact-grid">
+      <div class="contact-info-group">
+        <div class="contact-card">
+          <h3 class="contact-card-title">📍 Headquarters</h3>
+          <div class="contact-card-content">
+            <p><strong>Bravia Construction</strong><br>
+            123 Premier Tower<br>
+            Bandra, Mumbai 400050<br>
+            <strong>India</strong></p>
+          </div>
+        </div>
+        <div class="contact-card">
+          <h3 class="contact-card-title">📞 Phone</h3>
+          <div class="contact-card-content">
+            <p><strong>Main Office:</strong><br><a href="tel:+912240405000">+91 22 4040 5000</a></p>
+            <p style="margin-top:12px"><strong>Project Enquiries:</strong><br><a href="tel:+919876543210">+91 98765 43210</a></p>
+          </div>
+        </div>
+        <div class="contact-card">
+          <h3 class="contact-card-title">✉️ Email</h3>
+          <div class="contact-card-content">
+            <p><strong>General:</strong><br><a href="mailto:info@bravia.com">info@bravia.com</a></p>
+            <p style="margin-top:12px"><strong>Project Quotes:</strong><br><a href="mailto:quotes@bravia.com">quotes@bravia.com</a></p>
+          </div>
+        </div>
+        <div class="contact-card">
+          <h3 class="contact-card-title">🕐 Business Hours</h3>
+          <div class="contact-card-content">
+            <p><strong>Monday – Friday:</strong> 9:00 AM – 6:00 PM<br>
+            <strong>Saturday:</strong> 10:00 AM – 4:00 PM<br>
+            <strong>Sunday:</strong> Closed</p>
+          </div>
+        </div>
+        <a onclick="openPage('enquiry')" class="btn-primary" style="text-align:center;display:block;padding:16px;">Send an Enquiry →</a>
+      </div>
+      <div class="location-showcase">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3771.6299236405003!2d72.83006397601456!3d19.056688382136456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c8b8e8b8e8b9%3A0x8b8e8b8e8b8e8b8e!2sBandra%2C%20Mumbai%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1234567890" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <div class="location-badge">📍 Mumbai, India</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT PAGE -->
+<div class="page-overlay" id="page-about">
+  <div class="page-header">
+    <button class="btn-home" onclick="goHome()">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9.5L10 3l7 6.5"/><path d="M5 8v8a1 1 0 001 1h3v-4h2v4h3a1 1 0 001-1V8"/>
+      </svg>
+      <span>Back to Home</span>
+    </button>
+    <div class="header-divider"></div>
+    <h1 class="page-title">About Bravia</h1>
+    <button class="close-btn" onclick="closePage()" title="Close">&times;</button>
+  </div>
+  <div class="page-content">
+    <div class="about-hero">
+      <h2>Shaping the Future,<br><em>One Structure at a Time</em></h2>
+      <p style="margin-top:16px">For over 16 years, Bravia Construction has been the trusted partner for landmark projects across residential, commercial, and mixed-use sectors. We don't just build; we create legacies.</p>
+    </div>
+    <div class="about-sections">
+      <div class="about-section">
+        <h3>Our Mission</h3>
+        <p>To deliver exceptional construction excellence through innovative design, meticulous craftsmanship, and unwavering commitment to our clients. Every project is an opportunity to exceed expectations and set new standards in the industry.</p>
+      </div>
+      <div class="about-section">
+        <h3>Our Vision</h3>
+        <p>To be the most trusted construction partner in India, recognized for our integrity, precision, and the enduring quality of our work. We envision a built environment where excellence is the baseline, not the exception.</p>
+      </div>
+    </div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:2rem;margin:60px 0 40px;text-align:center;color:var(--black)">Our Journey</h3>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-year">2008</div>
+        <div class="timeline-content">
+          <h4>Foundation &amp; First Project</h4>
+          <p>Bravia Construction is founded with a vision to revolutionize the construction industry. Our first project, a 50-unit residential complex, sets the standard for quality and precision.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">2011</div>
+        <div class="timeline-content">
+          <h4>Commercial Expansion</h4>
+          <p>We successfully complete our first commercial project — a 200,000 sq ft office tower. This milestone establishes Bravia as a full-service construction partner.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">2015</div>
+        <div class="timeline-content">
+          <h4>Awards &amp; Recognition</h4>
+          <p>Bravia receives multiple industry awards for excellence in construction and design. We cross 100+ completed projects, solidifying our reputation in the market.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">2019</div>
+        <div class="timeline-content">
+          <h4>Innovation &amp; Sustainability</h4>
+          <p>We introduce green building practices and LEED-certified projects. Our commitment to sustainable construction becomes a core differentiator.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">2024</div>
+        <div class="timeline-content">
+          <h4>Present Day — 320+ Projects</h4>
+          <p>With 320+ completed projects, 42 industry awards, and 98% client satisfaction, Bravia stands as a beacon of excellence in construction and design.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TESTIMONIALS PAGE -->
+<div class="page-overlay" id="page-testimonials">
+  <div class="page-header">
+    <button class="btn-home" onclick="goHome()">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9.5L10 3l7 6.5"/><path d="M5 8v8a1 1 0 001 1h3v-4h2v4h3a1 1 0 001-1V8"/>
+      </svg>
+      <span>Back to Home</span>
+    </button>
+    <div class="header-divider"></div>
+    <h1 class="page-title">Client Testimonials</h1>
+    <button class="close-btn" onclick="closePage()" title="Close">&times;</button>
+  </div>
+  <div class="page-content">
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="star-rating">★★★★★</div>
+        <p class="testimonial-text">"Bravia transformed our vision into reality with extraordinary precision and professionalism. Every detail was handled with care, and the final result exceeded our expectations."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">A</div>
+          <div class="testimonial-info"><h4>Arun Kapoor</h4><span>Lumière Residences Owner</span></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="star-rating">★★★★★</div>
+        <p class="testimonial-text">"Working with Bravia on our commercial tower was seamless. Their project management expertise and commitment to timelines is unparalleled in the industry."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">P</div>
+          <div class="testimonial-info"><h4>Priya Sharma</h4><span>Vega Tower Project Director</span></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="star-rating">★★★★★</div>
+        <p class="testimonial-text">"We've worked with many contractors, but Bravia's attention to detail and craftsmanship is exceptional. This is a team that genuinely cares about their work."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">R</div>
+          <div class="testimonial-info"><h4>Rajesh Verma</h4><span>Real Estate Developer</span></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="star-rating">★★★★★</div>
+        <p class="testimonial-text">"From initial consultation to final handover, Bravia was transparent, professional, and delivered exactly what was promised. Highly recommended!"</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">V</div>
+          <div class="testimonial-info"><h4>Vikram Desai</h4><span>Commercial Client</span></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="star-rating">★★★★★</div>
+        <p class="testimonial-text">"Bravia's team brought innovation and excellence to our heritage restoration project. The respect for original architecture combined with modern standards was perfect."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">N</div>
+          <div class="testimonial-info"><h4>Neha Patel</h4><span>Heritage Conservation Project</span></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="star-rating">★★★★★</div>
+        <p class="testimonial-text">"The quality of craftsmanship is exceptional. Every corner of our villa reflects the dedication and expertise of the Bravia team. Worth every rupee!"</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">S</div>
+          <div class="testimonial-info"><h4>Sandeep Singh</h4><span>Soleil Villa Resident</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:60px">
+      <a onclick="openPage('enquiry')" class="btn-primary">Start Your Project with Us →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ENQUIRY FORM PAGE -->
+<div class="page-overlay" id="page-enquiry">
+  <div class="page-header">
+    <button class="btn-home" onclick="goHome()">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9.5L10 3l7 6.5"/><path d="M5 8v8a1 1 0 001 1h3v-4h2v4h3a1 1 0 001-1V8"/>
+      </svg>
+      <span>Back to Home</span>
+    </button>
+    <div class="header-divider"></div>
+    <h1 class="page-title">Project Enquiry</h1>
+    <button class="close-btn" onclick="closePage()" title="Close">&times;</button>
+  </div>
+  <div class="page-content">
+    <div class="enquiry-container">
+      <div class="enquiry-intro">
+        <h2>Tell Us About Your Project</h2>
+        <p>Fill in the details below and our team will get back to you within one business day.</p>
+      </div>
+      <form id="enquiry-form" onsubmit="handleEnquiry(event)">
+        <div class="form-group">
+          <label for="fullname">Full Name *</label>
+          <input type="text" id="fullname" name="fullname" required placeholder="Your full name">
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+        </div>
+        <div class="form-group">
+          <label for="phone">Mobile Number *</label>
+          <input type="tel" id="phone" name="phone" required placeholder="+91 XXXXX XXXXX">
+        </div>
+        <div class="form-group">
+          <label for="projecttype">Project Type *</label>
+          <select id="projecttype" name="projecttype" required>
+            <option value="">Select Project Type</option>
+            <option value="residential">Residential</option>
+            <option value="commercial">Commercial</option>
+            <option value="mixed-use">Mixed-Use Development</option>
+            <option value="interior">Interior Fit-Out</option>
+            <option value="restoration">Restoration</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="budget">Budget Range *</label>
+          <select id="budget" name="budget" required>
+            <option value="">Select Budget Range</option>
+            <option value="under-50">Under ₹50 Lakhs</option>
+            <option value="50-1cr">₹50 Lakhs – ₹1 Cr</option>
+            <option value="1-5cr">₹1 Cr – ₹5 Cr</option>
+            <option value="5-10cr">₹5 Cr – ₹10 Cr</option>
+            <option value="above-10cr">Above ₹10 Cr</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="message">Project Details</label>
+          <textarea id="message" name="message" placeholder="Tell us about your project, timeline, and specific requirements…"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-submit">Send Enquiry</button>
+          <button type="button" class="btn-cancel" onclick="closePage()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ── Navbar ── */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 80), {passive:true});
+
+/* ── Parallax engine ── */
+const pxDefs  = [{id:'bg1',speed:.36},{id:'bg2',speed:.22},{id:'bg3',speed:.18},{id:'bg4',speed:.28}];
+const decoDefs = [{id:'dw1a',speed:.16},{id:'dw1b',speed:-.12},{id:'dw2',speed:.11},{id:'dw4',speed:-.09}];
+const pxItems   = pxDefs.map(d  => ({el:document.getElementById(d.id),speed:d.speed}));
+const decoItems = decoDefs.map(d => ({el:document.getElementById(d.id),speed:d.speed}));
+const pBar = document.getElementById('prog');
+const hv = () => window.innerHeight * .5;
+
+let rafId;
+function frame() {
+  const h = hv(), sy = scrollY, dh = document.documentElement.scrollHeight - innerHeight;
+  pxItems.forEach(({el,speed}) => {
+    if(!el)return;
+    const r = el.parentElement.getBoundingClientRect();
+    el.style.transform = `translateY(${(r.top+r.height*.5-h)*speed}px)`;
+  });
+  decoItems.forEach(({el,speed}) => {
+    if(!el)return;
+    const r = el.parentElement.getBoundingClientRect();
+    el.style.transform = `translateY(${(r.top+r.height*.5-h)*speed}px)`;
+  });
+  pBar.style.width = (sy/dh*100).toFixed(2) + '%';
+  updateDots();
+  rafId = requestAnimationFrame(frame);
+}
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden) cancelAnimationFrame(rafId); else rafId = requestAnimationFrame(frame);
+});
+rafId = requestAnimationFrame(frame);
+
+/* ── Section dots ── */
+const secIds = ['px-hero','sec-stats','sec-about','px-vis','sec-svc','px-qt','sec-proj','px-cta'];
+const dots = document.querySelectorAll('.dot');
+dots.forEach((d,i) => d.addEventListener('click', () => document.getElementById(secIds[i])?.scrollIntoView({behavior:'smooth'})));
+function updateDots() {
+  const mid = innerHeight * .48;
+  let best = Infinity, closest = 0;
+  secIds.forEach((id,i) => {
+    const el = document.getElementById(id); if(!el)return;
+    const d = Math.abs(el.getBoundingClientRect().top-mid);
+    if(d<best){best=d;closest=i;}
+  });
+  dots.forEach((d,i) => d.classList.toggle('on',i===closest));
+}
+
+/* ── Generic scroll reveal (.rv) ── */
+const rvEls = document.querySelectorAll('.rv, .rv-scale');
+const rvObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); rvObs.unobserve(e.target); }});
+}, {threshold:.1});
+rvEls.forEach(el => rvObs.observe(el));
+
+/* ── Hero word-by-word reveal ── */
+function animateWords(containerSelector, baseDelay=0.35, step=0.11, easing='cubic-bezier(.23,1,.32,1)'){
+  const words = document.querySelectorAll(`${containerSelector} .w`);
+  words.forEach((w,i) => {
+    w.style.display = 'inline-block';
+    w.style.animation = `wordReveal .65s ${easing} ${(baseDelay + i*step).toFixed(2)}s forwards`;
+  });
+}
+animateWords('#hero-title', .4, .12);
+
+/* ── Quote words reveal on scroll ── */
+let quoteAnimated = false;
+const qtObs = new IntersectionObserver(entries => {
+  if(entries[0].isIntersecting && !quoteAnimated){
+    quoteAnimated = true;
+    animateWords('#q-text', 0.1, 0.08);
+    qtObs.disconnect();
+  }
+}, {threshold:.3});
+const qtSection = document.getElementById('px-qt');
+if(qtSection) qtObs.observe(qtSection);
+
+/* ── Stagger service cards ── */
+let svcDone = false;
+const svcObs = new IntersectionObserver(entries => {
+  if(entries[0].isIntersecting && !svcDone){
+    svcDone = true;
+    document.querySelectorAll('.svc-card').forEach(c => c.classList.add('entered'));
+    svcObs.disconnect();
+  }
+}, {threshold:.15});
+const svcGrid = document.getElementById('svc-grid');
+if(svcGrid) svcObs.observe(svcGrid);
+
+/* ── Stagger bento cards ── */
+let bentoDone = false;
+const bentoObs = new IntersectionObserver(entries => {
+  if(entries[0].isIntersecting && !bentoDone){
+    bentoDone = true;
+    document.querySelectorAll('.bc').forEach(c => c.classList.add('entered'));
+    bentoObs.disconnect();
+  }
+}, {threshold:.12});
+const bento = document.getElementById('bento');
+if(bento) bentoObs.observe(bento);
+
+/* ── Count-up animation ── */
+const counters = document.querySelectorAll('[data-target]');
+const cObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(!e.isIntersecting)return;
+    const el = e.target, target = +el.dataset.target;
+    const suffix = target===98 ? '%' : '+';
+    let n = 0; const step = Math.ceil(target/60);
+    const t = setInterval(() => {
+      n = Math.min(n+step,target);
+      el.textContent = n + suffix;
+      el.classList.add('ticked');
+      setTimeout(() => el.classList.remove('ticked'),250);
+      if(n>=target) clearInterval(t);
+    }, 22);
+    cObs.unobserve(el);
+  });
+}, {threshold:.5});
+counters.forEach(c => cObs.observe(c));
+
+/* ════════════════════════════
+   PAGE NAVIGATION SYSTEM
+════════════════════════════ */
+function openPage(pageName) {
+  const pageEl = document.getElementById(`page-${pageName}`);
+  if(pageEl) {
+    // Close any open overlay first
+    document.querySelectorAll('.page-overlay').forEach(p => p.classList.remove('active'));
+    pageEl.classList.add('active');
+    pageEl.scrollTop = 0;
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closePage() {
+  document.querySelectorAll('.page-overlay').forEach(p => p.classList.remove('active'));
+  document.body.style.overflow = '';
+}
+
+function goHome() {
+  closePage();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goToSection(id) {
+  closePage();
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if(el) el.scrollIntoView({ behavior: 'smooth' });
+  }, 420);
+}
+
+/* ── Form handler ── */
+function handleEnquiry(e) {
+  e.preventDefault();
+  const fullname = document.getElementById('fullname').value;
+  const email    = document.getElementById('email').value;
+  const phone    = document.getElementById('phone').value;
+  alert(`Thank you, ${fullname}! We've received your enquiry and will contact you shortly at ${email} or ${phone}.`);
+  document.getElementById('enquiry-form').reset();
+  closePage();
+}
+
+/* ── Escape key ── */
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closePage(); });
+</script>
+</body>
+</html>
